@@ -76,10 +76,10 @@ class TwoLayerNet(object):
     # Store the result in the scores variable, which should be an array of      #
     # shape (N, C).                                                             #
     #############################################################################
-    # hidden_layer = np.maximum(0, X.dot(W1) + b1)
+    hidden_layer = np.maximum(0, X.dot(W1) + b1)
 
     # Apply leaky ReLU
-    hidden_layer = np.maximum(0.01 * (X.dot(W1) + b1), X.dot(W1) + b1)
+    # hidden_layer = np.maximum(0.01 * (X.dot(W1) + b1), X.dot(W1) + b1)
     score_2 = hidden_layer.dot(W2) + b2
     # pass
     scores = score_2
@@ -136,11 +136,11 @@ class TwoLayerNet(object):
     dB2 = np.sum(dscores, axis=0)
 
     dhidden_layer = dscores.dot(W2.T)
-    # dhidden_layer[hidden_layer <= 0] = 0
+    dhidden_layer[hidden_layer <= 0] = 0
 
     # Apply leaky ReLU
     # dhidden_layer[hidden_layer <= (0.01 * hidden_layer)] = 0
-    dhidden_layer[hidden_layer <= (0.01 * hidden_layer)] *= 0.01
+    # dhidden_layer[hidden_layer <= (0.01 * hidden_layer)] *= 0.01
 
     dW1 = X.T.dot(dhidden_layer)
     dW1 += reg * W1
