@@ -295,11 +295,20 @@ class FullyConnectedNet(object):
                 beta = self.params['beta' + str(i)]
                 bn_param = self.bn_params[i - 1]
                 a, bn_cache = batchnorm_forward(a, gamma, beta, bn_param)
-                out, relu_cache = relu_forward(a)
-                layers[i], cache[i] = out, (fc_cache, relu_cache, bn_cache)
+                if self.use_dropout:
+                    out, relu_cache = relu_forward(a)
+                    out, dropout_cache = dropout_forward(out, self.dropout_param)
+                    layers[i], cache[i] = out, (fc_cache, relu_cache, bn_cache, dropout_cache)
+                else:
+                    out, relu_cache = relu_forward(a)
+                    layers[i], cache[i] = out, (fc_cache, relu_cache, bn_cache)
             else:
                 out, relu_cache = relu_forward(a)
-                layers[i], cache[i] = out, (fc_cache, relu_cache)
+                if self.use_dropout:
+                    out, dropout_cache = dropout_forward(out, self.dropout_param)
+                    layers[i], cache[i] = out, (fc_cache, relu_cache, dropout_cache)
+                else:
+                    layers[i], cache[i] = out, (fc_cache, relu_cache)
 
         a, fc_cache = affine_forward(layers[self.num_layers - 1], self.params['W%d' % (self.num_layers)], self.params['b%d' % (self.num_layers)])
         layers[self.num_layers], cache[self.num_layers] = a, fc_cache
@@ -349,11 +358,19 @@ class FullyConnectedNet(object):
         grads['W%d' % self.num_layers] += reg * self.params['W%d' % self.num_layers]
 
         for i in reversed(range(1, self.num_layers)):
-            if self.use_batchnorm:
+            if self.use_batchnorm and self.use_dropout:
+                fc_cache, relu_cache, bn_cache, dropout_cache = cache[i]
+            elif self.use_dropout:
+                fc_cache, relu_cache, dropout_cache = cache[i]
+            elif self.use_batchnorm:
                 fc_cache, relu_cache, bn_cache = cache[i]
             else:
                 fc_cache, relu_cache = cache[i]
-            da = relu_backward(dx[i + 1], relu_cache)
+            if self.use_dropout:
+                da = dropout_backward(dx[i + 1], dropout_cache)
+                da = relu_backward(da, relu_cache)
+            else:
+                da = relu_backward(dx[i + 1], relu_cache)
             if self.use_batchnorm:
                 da, dgamma, dbeta = batchnorm_backward(da, bn_cache)
                 grads['gamma' + str(i)] = dgamma
