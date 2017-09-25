@@ -65,6 +65,8 @@ def sgd_momentum(w, dw, config=None):
     # TODO: Implement the momentum update formula. Store the updated value in #
     # the next_w variable. You should also use and update the velocity v.     #
     ###########################################################################
+    v = config['momentum'] * v - config['learning_rate'] * dw
+    next_w = w + v
     pass
     ###########################################################################
     #                             END OF YOUR CODE                            #
@@ -99,6 +101,12 @@ def rmsprop(x, dx, config=None):
     # in the next_x variable. Don't forget to update cache value stored in    #
     # config['cache'].                                                        #
     ###########################################################################
+    decay_rate = config['decay_rate']
+    learning_rate = config['learning_rate']
+    epsilon = config['epsilon']
+
+    config['cache'] = (decay_rate * config['cache']) + ((1 - decay_rate) * (dx ** 2))
+    next_x = x - learning_rate * dx / (np.sqrt(config['cache']) + epsilon)
     pass
     ###########################################################################
     #                             END OF YOUR CODE                            #
@@ -136,6 +144,15 @@ def adam(x, dx, config=None):
     # the next_x variable. Don't forget to update the m, v, and t variables   #
     # stored in config.                                                       #
     ###########################################################################
+    m = config['m'] * config['beta1'] + ((1 - config['beta1']) * (dx))
+    mt = m / (1 - config['beta1'] ** config['t'])
+    v = config['v'] * config['beta2'] + ((1 - config['beta2']) * (dx ** 2))
+    vt = v / (1 - config['beta2'] ** config['t'])
+    next_x = x - (config['learning_rate'] * mt / (np.sqrt(vt) + config['epsilon']))
+    # next_x = x - config['learning_rate'] * m / (np.sqrt(v) + config['epsilon'])
+    config['m'] = m
+    config['v'] = v
+    config['t'] = config['t'] + 1
     pass
     ###########################################################################
     #                             END OF YOUR CODE                            #

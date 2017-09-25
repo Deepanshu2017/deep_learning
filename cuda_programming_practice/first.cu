@@ -1,7 +1,6 @@
 #include <stdio.h>
 
 __global__ void cube(float * d_out, float * d_in){
-	// Calculate cube of all numbers
 	int idx = threadIdx.x;
 	d_out[idx] = d_in[idx] * d_in[idx] * d_in[idx];
 	return;
