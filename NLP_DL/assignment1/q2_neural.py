@@ -36,12 +36,41 @@ def forward_backward_prop(data, labels, params, dimensions):
     b2 = np.reshape(params[ofs:ofs + Dy], (1, Dy))
 
     ### YOUR CODE HERE: forward propagation
-    raise NotImplementedError
+    # a1 = sigmoid(data.dot(W1) + b1)
+    # softmax_output = softmax(a1.dot(W2) + b2)
+    # cost = -np.sum(labels * np.log(softmax_output))
+    # ### END YOUR CODE
+    #
+    # ### YOUR CODE HERE: backward propagation
+    # dscores = softmax_output - labels
+    #
+    # gradW2 = a1.T.dot(dscores)
+    # gradb2 = np.sum(dscores, axis=0)
+    #
+    # da1 = dscores.dot(W2.T)
+    # dz1 = sigmoid_grad(a1) * da1
+    #
+    # gradW1 = data.T.dot(dz1)
+    # gradb1 = np.sum(dz1, axis=0)
     ### END YOUR CODE
 
-    ### YOUR CODE HERE: backward propagation
-    raise NotImplementedError
-    ### END YOUR CODE
+    z1 = np.dot(data, W1) + b1
+    a1 = sigmoid(z1)
+    scores = np.dot(a1, W2) + b2
+
+    y_pred = softmax(scores)
+    cost = -np.sum(labels * np.log(y_pred))
+
+    # ### END YOUR CODE
+
+    # ### YOUR CODE HERE: backward propagation
+    dscores = y_pred - labels
+    gradW2 = np.dot(a1.T, dscores)
+    gradb2 = np.sum(dscores, axis=0)
+    da1 = np.dot(dscores, W2.T)
+    dz1 = sigmoid_grad(a1) * da1
+    gradW1 = np.dot(data.T, dz1)
+    gradb1 = np.sum(dz1, axis=0)
 
     ### Stack gradients (do not modify)
     grad = np.concatenate((gradW1.flatten(), gradb1.flatten(),
@@ -80,7 +109,7 @@ def your_sanity_checks():
     """
     print "Running your sanity checks..."
     ### YOUR CODE HERE
-    raise NotImplementedError
+    # raise NotImplementedError
     ### END YOUR CODE
 
 

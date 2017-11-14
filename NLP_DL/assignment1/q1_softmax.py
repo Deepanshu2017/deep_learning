@@ -32,7 +32,7 @@ def softmax(x):
         ### YOUR CODE HERE
         max_value = np.max(x, axis=1)
         x = x - max_value.reshape(-1, 1)
-        x = np.exp(x) / np.sum(np.exp(x), axis=1)
+        x = np.exp(x) / np.sum(np.exp(x), axis=1).reshape(-1, 1)
         # raise NotImplementedError
         ### END YOUR CODE
     else:
